@@ -3,7 +3,7 @@ const asyncHandler = require("express-async-handler");
 const User = require("../models/userModel");
 const bCrypt = require("bcrypt");
 const jwt = require("jsonwebtoken")
-
+const validator = require('validator');
 
 
 const registerUser = asyncHandler(async (req, res) => {
@@ -15,6 +15,10 @@ const registerUser = asyncHandler(async (req, res) => {
         throw new Error("All fields are mandatory!")
     }
 
+    if(!validator.isEmail(email)) {
+        res.status(400);
+        throw new Error("Invalidate email format")
+    }
     const userAvaliable = await User.findOne({ email });
 
     if (userAvaliable) {
@@ -32,7 +36,7 @@ const registerUser = asyncHandler(async (req, res) => {
         })
         console.log(`User created ${newUser}`)
 
-        if (user) {
+        if (newUser) {
             res.status(201).json(newUser);
         } else {
             res.status(400);
